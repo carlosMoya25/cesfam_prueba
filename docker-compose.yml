@@ -1,12 +1,11 @@
 
 services:
-  cesfam-web:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
 
-    container_name: cesfam-web
-
+    container_name: cesfam_web
     restart: unless-stopped
 
     env_file:
@@ -25,17 +24,13 @@ services:
     expose:
       - "8000"
 
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     networks:
-      - proxy
+      - cesfam_db
 
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
 
-      # Dominios
+      # Dominio principal y www
       - "traefik.http.routers.cesfam.rule=Host(`cesfam.liceosp.cl`) || Host(`www.cesfam.liceosp.cl`)"
 
       # HTTPS
@@ -43,14 +38,15 @@ services:
       - "traefik.http.routers.cesfam.tls=true"
       - "traefik.http.routers.cesfam.tls.certresolver=letsencrypt"
 
-      # Puerto interno de Django
-      - "traefik.http.services.cesfam.loadbalancer.server.port=8000"
+      # Servicio Django
       - "traefik.http.routers.cesfam.service=cesfam"
+      - "traefik.http.services.cesfam.loadbalancer.server.port=8000"
 
 volumes:
   cesfam_static:
   cesfam_media:
 
 networks:
-  proxy:
+  cesfam_db:
     external: true
+    name: mariadb-dgfx_default
