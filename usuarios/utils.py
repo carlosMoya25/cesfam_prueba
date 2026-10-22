@@ -18,3 +18,15 @@ def es_encargado_inventario(usuario):
 
 def puede_gestionar_inventario(usuario):
     return es_encargado_inventario(usuario) or es_administrador(usuario)
+
+
+def es_encargado_farmacia(usuario):
+    return tiene_rol(usuario, "Encargado de Farmacia")
+
+
+def puede_gestionar_farmacia(usuario):
+    return (
+        usuario.is_authenticated
+        and usuario.is_active
+        and (es_administrador(usuario) or es_encargado_farmacia(usuario))
+    )

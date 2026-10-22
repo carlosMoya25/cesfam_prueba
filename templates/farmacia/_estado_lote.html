@@ -1,0 +1,4 @@
+{% if stock.lote.fecha_vencimiento < hoy %}<span class="inventory-badge inventory-badge-danger">Vencido</span>
+{% elif not stock.lote.activo or not stock.lote.medicamento.activo or not stock.lote.medicamento.articulo.activo or not stock.anexo.activo %}<span class="inventory-badge inventory-badge-neutral">Inactivo</span>
+{% elif stock.lote.fecha_vencimiento <= fecha_limite %}<span class="inventory-badge inventory-badge-warning">Próximo a vencer</span>
+{% else %}<span class="inventory-badge inventory-badge-success">Vigente</span>{% endif %}

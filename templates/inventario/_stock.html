@@ -1,0 +1,35 @@
+<div class="inventory-table-shell">
+    <div class="inventory-table-scroll">
+        <table class="inventory-table">
+            <caption class="inventory-sr-only">Existencias de artículos por ubicación</caption>
+            <thead><tr><th scope="col">Artículo</th><th scope="col">Categoría</th><th scope="col">Ubicación</th><th scope="col" class="inventory-number">Stock</th><th scope="col" class="inventory-number">Mínimo</th><th scope="col">Estado</th><th scope="col"><span class="inventory-sr-only">Acciones</span></th></tr></thead>
+            <tbody>
+            {% for stock in stocks %}
+            <tr>
+                <td><strong>{{ stock.articulo.nombre }}</strong><small>{{ stock.articulo.codigo|default:"Sin código" }}{% if not stock.articulo.activo %} · Inactivo{% endif %}</small></td>
+                <td>{{ stock.articulo.categoria.nombre }}</td>
+                <td>{{ stock.anexo.nombre }}{% if not stock.anexo.activo %}<small>Ubicación inactiva</small>{% endif %}</td>
+                <td class="inventory-number">{{ stock.cantidad }}</td><td class="inventory-number">{{ stock.articulo.stock_minimo }}</td>
+                <td>{% if stock.cantidad == 0 %}<span class="inventory-badge inventory-badge-danger">Agotado</span>{% elif stock.stock_bajo %}<span class="inventory-badge inventory-badge-warning">Stock bajo</span>{% else %}<span class="inventory-badge inventory-badge-success">Disponible</span>{% endif %}</td>
+                <td class="inventory-row-action">
+                    {% if stock.articulo.activo and stock.anexo.activo %}
+                    <details class="inventory-dropdown inventory-row-dropdown">
+                        <summary aria-label="Acciones para {{ stock.articulo.nombre }} en {{ stock.anexo.nombre }}">Acciones <span aria-hidden="true">⌄</span></summary>
+                        <div class="inventory-dropdown-menu">
+                            <a href="{% url 'inventario:entrada' %}?articulo={{ stock.articulo_id }}&amp;anexo={{ stock.anexo_id }}">Registrar entrada</a>
+                            {% if stock.cantidad > 0 %}
+                            <a href="{% url 'inventario:salida' %}?articulo={{ stock.articulo_id }}&amp;anexo={{ stock.anexo_id }}">Registrar salida</a>
+                            <a href="{% url 'inventario:transferencia' %}?articulo={{ stock.articulo_id }}&amp;anexo_origen={{ stock.anexo_id }}">Transferir</a>
+                            {% endif %}
+                        </div>
+                    </details>
+                    {% else %}<span class="inventory-muted" title="Active el artículo y la ubicación para operar">Sin acciones</span>{% endif %}
+                </td>
+            </tr>
+            {% empty %}<tr><td colspan="7" class="inventory-empty"><strong>No hay existencias para esta búsqueda</strong><p>Pruebe otros filtros o registre una entrada para incorporar existencias.</p><a href="{{ request.path }}">Limpiar filtros</a></td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "inventario/_paginacion.html" %}
+</div>
+<p class="inventory-footnote">Cada registro corresponde a un artículo en una ubicación. Los artículos sin entradas todavía no tienen un registro de stock.</p>

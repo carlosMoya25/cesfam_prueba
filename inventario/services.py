@@ -12,6 +12,16 @@ from .models import (
 )
 
 
+def validar_articulo_general(articulo):
+    # Serializar con las regularizaciones para no reingresar saldos pendientes.
+    Articulo.objects.select_for_update().get(pk=articulo.pk)
+    if (Articulo.objects.filter(pk=articulo.pk, medicamento__isnull=False).exists()
+            or Articulo.objects.filter(pk=articulo.pk, saldos_pendientes_farmacia__isnull=False).exists()):
+        raise ValidationError(
+            "Los medicamentos deben gestionarse desde Farmacia, indicando su lote."
+        )
+
+
 def obtener_tipo_movimiento(nombre):
     try:
         return TipoMovimiento.objects.get(
@@ -26,6 +36,8 @@ def obtener_tipo_movimiento(nombre):
 
 @transaction.atomic
 def registrar_entrada(*, usuario, anexo, articulo, cantidad, motivo=""):
+    validar_articulo_general(articulo)
+
     if cantidad <= 0:
         raise ValidationError("La cantidad debe ser mayor a cero.")
 
@@ -61,6 +73,8 @@ def registrar_entrada(*, usuario, anexo, articulo, cantidad, motivo=""):
 
 @transaction.atomic
 def registrar_salida(*, usuario, anexo, articulo, cantidad, motivo=""):
+    validar_articulo_general(articulo)
+
     if cantidad <= 0:
         raise ValidationError("La cantidad debe ser mayor a cero.")
 
@@ -111,6 +125,8 @@ def registrar_transferencia(
     cantidad,
     motivo="",
 ):
+    validar_articulo_general(articulo)
+
     if cantidad <= 0:
         raise ValidationError("La cantidad debe ser mayor a cero.")
 
@@ -174,6 +190,8 @@ def registrar_ajuste(
     tipo_ajuste,
     motivo,
 ):
+    validar_articulo_general(articulo)
+
     if cantidad <= 0:
         raise ValidationError(
             "La cantidad debe ser mayor a cero."
@@ -241,6 +259,8 @@ def registrar_recurso_requerimiento(
     cantidad,
     usuario,
 ):
+    validar_articulo_general(articulo)
+
     if cantidad <= 0:
         raise ValidationError(
             "La cantidad debe ser mayor a cero."

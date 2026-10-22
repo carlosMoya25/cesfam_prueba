@@ -45,3 +45,7 @@ urlpatterns = [
 
 
 ]
+
+handler403 = "core.errores.acceso_denegado"
+handler404 = "core.errores.enlace_no_disponible"
+handler500 = "core.errores.error_servidor"

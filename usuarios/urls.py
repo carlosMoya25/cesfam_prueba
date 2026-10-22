@@ -1,12 +1,14 @@
 from django.urls import path
 
-from . import views
+from . import views, clave_views
 
 
 app_name = "usuarios"
 
 
 urlpatterns = [
+    path("mi-cuenta/clave/", clave_views.cambiar_clave, name="cambiar_clave"),
+    path("administracion/usuarios/<int:pk>/clave/", clave_views.restablecer_clave, name="restablecer_clave"),
 
     # ======================================================
     # ADMINISTRACIÓN

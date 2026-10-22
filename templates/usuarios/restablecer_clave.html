@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }} | SIGRI{% endblock %}
+{% block content %}
+<div class="page-header"><p class="admin-eyebrow">Administración / Usuarios</p><h1>{{ titulo }}</h1><p>{{ usuario_afectado.email }}</p></div>
+<div class="card admin-form-card"><p>La nueva contraseña reemplazará la anterior e invalidará las sesiones existentes. La cuenta conservará sus roles, su estado y su acceso mediante Google.</p>
+<form method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% include "usuarios/_clave_temporal.html" %}
+    <div class="admin-form-actions"><a class="btn btn-secondary" href="{% url 'usuarios:detalle_usuario' usuario_afectado.pk %}">Cancelar</a><button class="btn btn-primary" type="submit">Guardar contraseña temporal</button></div>
+</form></div>
+{% endblock %}

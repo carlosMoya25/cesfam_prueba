@@ -1,0 +1,35 @@
+{% extends "farmacia/_form_base.html" %}
+{% block inventory_description %}Registre medicamentos, lotes y recepciones con su vencimiento, origen y ubicación.{% endblock %}
+{% block inventory_body %}
+<ol class="farmacia-import-steps" aria-label="Pasos de la importación"><li aria-current="step">1. Subir archivo</li><li>2. Revisar y confirmar</li><li>3. Resultado</li></ol>
+<div class="farmacia-import-intro">
+    <h2>Una fila por medicamento y lote recibidos en Bodega Central</h2>
+    <p>Descargue la plantilla actualizada y guárdela como <strong>CSV UTF-8</strong>, separado por coma o punto y coma. Puede registrar varios lotes del mismo medicamento, manteniendo iguales sus datos de catálogo. Todas las recepciones ingresan a Bodega Central; después registre los traslados a los anexos.</p>
+    <a class="inventory-button" href="{% url 'farmacia:plantilla_csv' %}">Descargar plantilla con lotes y recepción</a>
+    <details class="farmacia-column-guide"><summary>Ver columnas y valores aceptados</summary>
+        <dl class="farmacia-medicine-info">
+            <div><dt>codigo / nombre</dt><dd>Código único del medicamento y su nombre. Si ya existe, sus datos deben coincidir.</dd></div>
+            <div><dt>principio_activo / concentracion</dt><dd>Ej.: Paracetamol / 500 mg.</dd></div>
+            <div><dt>forma_farmaceutica / presentacion</dt><dd>Ej.: Comprimido / Caja de 20. Presentación opcional.</dd></div>
+            <div><dt>requiere_receta / stock_minimo</dt><dd>si o no; mínimo entero mayor o igual a cero.</dd></div>
+            <div><dt>unidad_medida</dt><dd>Unidad de stock: comprimido, frasco, ampolla, etc. No se convierten cajas a unidades automáticamente.</dd></div>
+            <div><dt>numero_lote / fecha_vencimiento</dt><dd>Lote real del envase y vencimiento AAAA-MM-DD. Un mismo lote debe conservar su vencimiento.</dd></div>
+            <div><dt>ubicacion_id / cantidad</dt><dd>ID de Bodega Central de la lista inferior y entero positivo recibido, expresado en la unidad de stock.</dd></div>
+            <div><dt>proveedor / documento_recepcion</dt><dd>Proveedor u origen de abastecimiento y referencia de guía, factura, acta u otro documento que respalde la recepción.</dd></div>
+            <div><dt>fecha_recepcion</dt><dd>Fecha real de recepción AAAA-MM-DD. No puede ser futura. La fecha de registro en el sistema se guarda por separado.</dd></div>
+            <div><dt>descripcion / observaciones</dt><dd>Opcionales: descripción del medicamento y observaciones de esta recepción.</dd></div>
+        </dl>
+    </details>
+    <details class="farmacia-column-guide"><summary>Ver ID de Bodega Central</summary><div class="inventory-table-shell"><div class="inventory-table-scroll"><table class="inventory-table"><thead><tr><th scope="col">ubicacion_id</th><th scope="col">Ubicación</th></tr></thead><tbody>{% for ubicacion in ubicaciones %}<tr><td>{{ ubicacion.pk }}</td><td>{{ ubicacion.nombre }}</td></tr>{% empty %}<tr><td colspan="2">Bodega Central no está configurada o está inactiva. Solicite al administrador revisar la ubicación antes de importar.</td></tr>{% endfor %}</tbody></table></div></div></details>
+    <p class="inventory-footnote">La vista previa no modifica datos. Al confirmar, se guardan juntos el medicamento, su lote, las existencias y el movimiento de entrada. Una misma recepción no puede repetirse para el mismo proveedor, documento, medicamento, lote y destino: agrupe sus cantidades en una fila.</p>
+    <p class="inventory-footnote">Si hay errores, podrá revisar sus motivos, descargar un reporte e importar solo las filas válidas con confirmación explícita. Después corrija y vuelva a cargar únicamente las omitidas.</p>
+    <p class="inventory-footnote">Si un medicamento antiguo tiene existencias sin unidad definida, complete primero su ficha verificando la unidad real de ese stock.</p>
+</div>
+<form method="post" enctype="multipart/form-data" class="inventory-form">
+    {% csrf_token %}{% include "inventario/_form_fields.html" %}
+    <div class="inventory-form-actions"><button class="inventory-button inventory-primary" type="submit">Revisar archivo</button><a class="inventory-button" href="{% url 'farmacia:lista_medicamentos' %}">Cancelar</a></div>
+</form>
+{% if importaciones %}
+<section class="farmacia-recent-imports"><h2>Mis últimas importaciones</h2><div class="inventory-table-shell"><div class="inventory-table-scroll"><table class="inventory-table"><thead><tr><th scope="col">Archivo</th><th scope="col">Fecha</th><th scope="col">Contenido</th><th scope="col">Recepciones</th><th scope="col">Omitidas</th></tr></thead><tbody>{% for importacion in importaciones %}<tr><td><a class="inventory-text-link" href="{% url 'farmacia:revisar_importacion' importacion.pk %}">{{ importacion.nombre_archivo }}</a></td><td>{{ importacion.importada_at|date:"d/m/Y H:i" }}</td><td>{{ importacion.get_modalidad_display }}</td><td>{{ importacion.cantidad_movimientos }}</td><td>{{ importacion.cantidad_omitidas }}</td></tr>{% endfor %}</tbody></table></div></div></section>
+{% endif %}
+{% endblock %}

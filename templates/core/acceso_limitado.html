@@ -1,0 +1,25 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{{ titulo }} | SIGRI</title>
+    <link rel="stylesheet" href="{% static 'css/acceso_limitado.css' %}">
+</head>
+<body>
+    <main class="access-page" aria-labelledby="access-title">
+        <p class="access-brand">SIGRI · CESFAM San Pedro</p>
+        <div class="access-symbol" aria-hidden="true">{% if codigo == 403 %}&#128274;{% else %}&#9432;{% endif %}</div>
+        <p class="access-code">{{ codigo }}</p>
+        <h1 id="access-title">{{ titulo }}</h1>
+        <p class="access-message">{{ mensaje }}</p>
+        <p class="access-help">{{ ayuda }}</p>
+        <nav class="access-actions" aria-label="Opciones para continuar">
+            <a class="access-button access-primary" href="{{ volver_url }}">← Volver atrás</a>
+            <a class="access-button" href="{{ inicio_url }}">Ir al inicio</a>
+        </nav>
+    </main>
+</body>
+</html>

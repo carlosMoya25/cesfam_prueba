@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% if titulo %}{{ titulo }} | {% endif %}Inventario | CESFAM San Pedro{% endblock %}
+{% block body_class %}inventory-view{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/inventario.css' %}">{% endblock %}
+{% block content %}
+<section class="inventory-page">
+    <nav class="inventory-breadcrumb" aria-label="Ruta de navegación">
+        <a href="{% url 'dashboard' %}">Inicio</a><span aria-hidden="true">/</span>
+        {% block inventory_breadcrumb %}<span>Inventario</span>{% endblock %}
+    </nav>
+    <header class="inventory-heading">
+        <div><h1>{% block inventory_heading %}Inventario{% endblock %}</h1><p>{% block inventory_description %}Control de artículos y existencias por ubicación.{% endblock %}</p></div>
+        {% block inventory_admin %}
+        <details class="inventory-dropdown inventory-admin">
+            <summary class="inventory-button">Administrar <span aria-hidden="true">⌄</span></summary>
+            <div class="inventory-dropdown-menu">
+                <a href="{% url 'inventario:articulos' %}">Artículos</a>
+                <a href="{% url 'inventario:categorias' %}">Categorías</a>
+                <a href="{% url 'inventario:crear_departamento' %}">Crear departamento</a>
+                <a href="{% url 'inventario:crear_ubicacion' %}">Crear ubicación</a>
+                <a href="{% url 'inventario:ajuste' %}">Ajustar existencias</a>
+            </div>
+        </details>
+        {% endblock %}
+    </header>
+    {% block inventory_actions %}{% endblock %}
+    {% block inventory_summary %}{% endblock %}
+    {% block inventory_navigation %}
+    <nav class="inventory-tabs" aria-label="Secciones de inventario">
+        <a href="{% url 'inventario:panel' %}">Existencias</a>
+        <a href="{% url 'inventario:historial' %}">Historial</a>
+        <a href="{% url 'inventario:articulos' %}"{% if request.resolver_match.url_name == 'articulos' %} aria-current="page"{% endif %}>Artículos</a>
+        <a href="{% url 'inventario:categorias' %}"{% if request.resolver_match.url_name == 'categorias' %} aria-current="page"{% endif %}>Categorías</a>
+    </nav>
+    {% endblock %}
+    {% block inventory_body %}{% endblock %}
+</section>
+<script src="{% static 'js/inventario_panel.js' %}" defer></script>
+{% block inventory_scripts %}{% endblock %}
+{% endblock %}

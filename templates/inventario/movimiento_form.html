@@ -1,27 +1,15 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-<h1>{{ titulo }}</h1>
-
-<div class="card">
-
-    <form method="post">
-
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <button class="btn" type="submit">
-            Guardar movimiento
-        </button>
-
-        <a class="btn" href="{% url 'inventario:panel' %}">
-            Cancelar
-        </a>
-
-    </form>
-
-</div>
-
+{% extends "inventario/_form_base.html" %}
+{% load static %}
+{% block inventory_description %}Seleccione la ubicación y busque el artículo por nombre o código.{% endblock %}
+{% block inventory_body %}
+<a class="inventory-back-link" href="{% url 'inventario:panel' %}">‹ Volver a existencias</a>
+<form method="post" id="inv-movimiento" class="inventory-form" data-operacion="{{ operacion }}">
+    {% csrf_token %}
+    {% include "inventario/_form_fields.html" %}
+    <div class="inventory-preview" aria-live="polite"><strong>Vista previa del movimiento</strong><p id="inv-saldo">Seleccione ubicación y artículo para consultar el stock.</p><p id="inv-aviso" class="inv-error"></p><small>El saldo es orientativo. Las existencias se validan nuevamente al guardar.</small></div>
+    <div class="inventory-form-actions"><button class="inventory-button inventory-primary" type="submit" id="inv-guardar">{{ boton }}</button><a class="inventory-button" href="{% url 'inventario:panel' %}">Cancelar</a></div>
+</form>
+{{ stocks_movimiento|json_script:"inv-stocks" }}
+{{ articulos_movimiento|json_script:"inv-articulos" }}
 {% endblock %}
+{% block inventory_scripts %}<script src="{% static 'js/inventario_movimiento.js' %}" defer></script>{% endblock %}

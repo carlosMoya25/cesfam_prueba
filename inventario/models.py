@@ -82,7 +82,7 @@ class StockAnexo(models.Model):
 
     @property
     def stock_bajo(self):
-        return self.cantidad <= self.articulo.stock_minimo
+        return 0 < self.cantidad <= self.articulo.stock_minimo
 
     def __str__(self):
         return f"{self.articulo} - {self.anexo}: {self.cantidad}"

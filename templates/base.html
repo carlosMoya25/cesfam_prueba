@@ -16,11 +16,12 @@
     </title>
 
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
 
 </head>
 
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
     <div class="app-layout">
 
@@ -82,30 +83,6 @@
                     {% endif %}
 
 
-                    <!-- ENCARGADO DE INVENTARIO -->
-
-                    {% if grupo.name == "Encargado de Inventario" %}
-
-                        <a href="{% url 'inventario:panel' %}" class="sidebar-link">
-                            <span class="sidebar-icon">□</span>
-                            <span>Inventario</span>
-                        </a>
-
-                    {% endif %}
-
-
-                    <!-- ENCARGADO DE FARMACIA -->
-
-                    {% if grupo.name == "Encargado de Farmacia" %}
-
-                        <a href="#" class="sidebar-link">
-                            <span class="sidebar-icon">✚</span>
-                            <span>Farmacia</span>
-                        </a>
-
-                    {% endif %}
-
-
                     <!-- =================================================
                          ADMINISTRADOR
                          ================================================= -->
@@ -116,19 +93,6 @@
                             <span class="sidebar-icon">⚙</span>
                             <span>Panel Técnico</span>
                         </a>
-
-                        <a href="{% url 'inventario:panel' %}" class="sidebar-link">
-                            <span class="sidebar-icon">□</span>
-                            <span>Inventario</span>
-                        </a>
-
-                        <!-- Farmacia todavía no está implementada -->
-
-                        <a href="#" class="sidebar-link">
-                            <span class="sidebar-icon">✚</span>
-                            <span>Farmacia</span>
-                        </a>
-
 
                         <!-- NUEVO PANEL DE ADMINISTRACIÓN -->
 
@@ -190,6 +154,17 @@
 
                 {% endif %}
 
+                {% if puede_gestionar_inventario %}
+                <a href="{% url 'inventario:panel' %}" class="sidebar-link{% if request.resolver_match.app_name == 'inventario' %} active{% endif %}"{% if request.resolver_match.app_name == 'inventario' %} aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">□</span><span>Inventario</span>
+                </a>
+                {% endif %}
+                {% if puede_gestionar_farmacia %}
+                <a href="{% url 'farmacia:dashboard' %}" class="sidebar-link{% if request.resolver_match.app_name == 'farmacia' %} active{% endif %}"{% if request.resolver_match.app_name == 'farmacia' %} aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">✚</span>
+                    <span>Farmacia</span>
+                </a>
+                {% endif %}
             </nav>
 
         </aside>
@@ -240,6 +215,8 @@
 
                         </div>
 
+
+                        <a href="{% url 'usuarios:cambiar_clave' %}" class="btn btn-secondary">Cambiar contraseña</a>
 
                         <form
                             method="post"

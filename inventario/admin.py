@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .forms import ArticuloForm
 
 from .models import (
     CategoriaArticulo,
@@ -20,6 +21,11 @@ class CategoriaArticuloAdmin(admin.ModelAdmin):
 
 @admin.register(Articulo)
 class ArticuloAdmin(admin.ModelAdmin):
+    form = ArticuloForm
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(medicamento__isnull=True, saldos_pendientes_farmacia__isnull=True)
+
     list_display = (
         "nombre",
         "codigo",
@@ -33,6 +39,14 @@ class ArticuloAdmin(admin.ModelAdmin):
 
 @admin.register(StockAnexo)
 class StockAnexoAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(articulo__medicamento__isnull=True, articulo__saldos_pendientes_farmacia__isnull=True)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "articulo":
+            kwargs["queryset"] = Articulo.objects.filter(medicamento__isnull=True, saldos_pendientes_farmacia__isnull=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     list_display = (
         "articulo",
         "anexo",

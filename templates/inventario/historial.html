@@ -1,77 +1,21 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-<h1>Historial de movimientos</h1>
-
-<div class="card">
-
-    <a class="btn" href="{% url 'inventario:panel' %}">
-        Volver al inventario
-    </a>
-
+{% extends "inventario/_layout.html" %}
+{% block inventory_body %}
+{% include "inventario/_busqueda_compacta.html" %}
+<div class="inventory-table-shell">
+    <div class="inventory-table-scroll">
+        <table class="inventory-table inventory-history">
+            <caption class="inventory-sr-only">Historial de movimientos del inventario</caption>
+            <thead><tr><th scope="col">Movimiento / fecha</th><th scope="col">Artículos</th><th scope="col">Origen → destino</th><th scope="col">Responsable</th><th scope="col">Observaciones</th></tr></thead>
+            <tbody>{% for movimiento in movimientos %}
+            <tr>
+                <td><strong>#{{ movimiento.pk }} · {{ movimiento.tipo_movimiento.nombre }}</strong><small>{{ movimiento.fecha|date:"d/m/Y H:i" }}</small></td>
+                <td>{% for detalle in movimiento.detalles.all %}<div>{{ detalle.articulo.nombre }} <strong>× {{ detalle.cantidad }}</strong><small>{{ detalle.articulo.codigo|default:"Sin código" }}</small></div>{% endfor %}</td>
+                <td>{{ movimiento.anexo_origen.nombre|default:"—" }} → {{ movimiento.anexo_destino.nombre|default:"—" }}</td>
+                <td>{{ movimiento.usuario.email }}</td><td>{{ movimiento.motivo|default:"—" }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="5" class="inventory-empty"><strong>No se encontraron movimientos</strong><p>Revise las fechas o limpie los filtros.</p></td></tr>{% endfor %}</tbody>
+        </table>
+    </div>
+    {% include "inventario/_paginacion.html" %}
 </div>
-
-
-{% for movimiento in movimientos %}
-
-<div class="card">
-
-    <h3>
-        Movimiento #{{ movimiento.id }}
-        — {{ movimiento.tipo_movimiento.nombre }}
-    </h3>
-
-    <p>
-        <strong>Fecha:</strong>
-        {{ movimiento.fecha|date:"d/m/Y H:i" }}
-    </p>
-
-    {% if movimiento.anexo_origen %}
-    <p>
-        <strong>Origen:</strong>
-        {{ movimiento.anexo_origen.nombre }}
-    </p>
-    {% endif %}
-
-    {% if movimiento.anexo_destino %}
-    <p>
-        <strong>Destino:</strong>
-        {{ movimiento.anexo_destino.nombre }}
-    </p>
-    {% endif %}
-
-    <p>
-        <strong>Registrado por:</strong>
-        {{ movimiento.usuario.email }}
-    </p>
-
-    {% if movimiento.motivo %}
-    <p>
-        <strong>Motivo:</strong>
-        {{ movimiento.motivo }}
-    </p>
-    {% endif %}
-
-    <strong>Artículos:</strong>
-
-    <ul>
-        {% for detalle in movimiento.detalles.all %}
-        <li>
-            {{ detalle.articulo.nombre }}
-            — {{ detalle.cantidad }} unidad(es)
-        </li>
-        {% endfor %}
-    </ul>
-
-</div>
-
-{% empty %}
-
-<div class="card">
-    No existen movimientos registrados.
-</div>
-
-{% endfor %}
-
 {% endblock %}

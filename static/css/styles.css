@@ -4615,3 +4615,63 @@ textarea {
 .inactive-login-button:active {
     transform: translateY(1px);
 }
+/* Filtros de farmacia: etiquetas visibles y distribución adaptable. */
+.farmacia-filtros {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 16px;
+    align-items: end;
+}
+.farmacia-filtro label { display: block; margin-bottom: 6px; font-weight: 600; }
+.farmacia-filtro input, .farmacia-filtro select {
+    width: 100%; min-height: 44px; padding: 10px; box-sizing: border-box;
+    border: 1px solid #cbd5e1; border-radius: 8px; background: #fff;
+}
+.farmacia-filtros-acciones, .farmacia-paginacion {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+}
+.farmacia-paginacion { justify-content: center; margin: 20px 0; }
+.farmacia-ayuda { color: #475569; margin-top: 12px; font-size: 14px; }
+.farmacia-error { display: block; color: #9f1239; margin-top: 6px; }
+.farmacia-estado { display: inline-block; padding: 4px 8px; border-radius: 6px; background: #e2e8f0; }
+.farmacia-vencido { color: #9f1239; background: #ffe4e6; }
+.farmacia-proximo { color: #854d0e; background: #fef9c3; }
+.farmacia-vigente { color: #166534; background: #dcfce7; }
+
+#entrada-farmacia-form { max-width: 760px; }
+#entrada-farmacia-form .form-group { margin-bottom: 18px; }
+#entrada-farmacia-form label { display: block; margin-bottom: 6px; font-weight: 600; }
+#entrada-farmacia-form input, #entrada-farmacia-form select, #entrada-farmacia-form textarea {
+    width: 100%; box-sizing: border-box; min-height: 44px; padding: 10px;
+    border: 1px solid #cbd5e1; border-radius: 8px; background: #fff;
+}
+#registrar-entrada:disabled { opacity: .55; cursor: not-allowed; }
+
+/* Inventario general */
+.inv-filtros {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+    gap: 16px; align-items: end;
+}
+.inv-filtros label, .inv-campo label { display: block; margin-bottom: 6px; font-weight: 600; }
+.inv-filtros input, .inv-filtros select, .inv-campo input, .inv-campo select, .inv-campo textarea {
+    width: 100%; box-sizing: border-box; min-height: 44px; padding: 10px;
+    border: 1px solid #cbd5e1; border-radius: 8px; background: #fff;
+}
+.inv-acciones { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.inv-campo { margin-bottom: 18px; }
+#inv-movimiento { max-width: 780px; }
+.inv-resumen { padding: 18px; margin: 18px 0; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; }
+.inv-error { color: #9f1239; }
+.inv-ayuda { color: #475569; font-size: 14px; }
+.inv-tabla { overflow-x: auto; }
+.inv-tabla table { width: 100%; border-collapse: collapse; }
+.inv-tabla th, .inv-tabla td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+.inv-tabla th { background: #f8fafc; }
+.inv-estado { display: inline-block; padding: 4px 10px; border-radius: 8px; white-space: nowrap; }
+.inv-agotado { color: #9f1239; background: #ffe4e6; }
+.inv-bajo { color: #854d0e; background: #fef9c3; }
+.inv-disponible { color: #166534; background: #dcfce7; }
+#inv-guardar:disabled { opacity: .55; cursor: not-allowed; }
+
+.inv-formulario { max-width: 780px; }
+.inv-campo input[type="checkbox"] { width: auto; min-height: auto; }

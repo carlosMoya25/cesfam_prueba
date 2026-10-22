@@ -1,0 +1,11 @@
+{% extends "inventario/_form_base.html" %}
+{% block inventory_description %}{{ descripcion }}{% endblock %}
+{% block inventory_body %}
+<a class="inventory-back-link" href="{% url 'inventario:panel' %}">‹ Volver a inventario</a>
+<p class="inventory-footnote">El registro quedará activo y disponible para seleccionarlo en las operaciones correspondientes.</p>
+<form method="post" class="inventory-form">
+    {% csrf_token %}
+    {% include "inventario/_form_fields.html" %}
+    <div class="inventory-form-actions"><button type="submit" class="inventory-button inventory-primary">{{ boton }}</button><a href="{% url 'inventario:panel' %}" class="inventory-button">Cancelar</a></div>
+</form>
+{% endblock %}

@@ -16,8 +16,17 @@ class MedicamentoAdmin(admin.ModelAdmin):
         "principio_activo",
         "concentracion",
         "forma_farmaceutica",
+        "unidad_medida",
         "activo",
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.unidad_medida and (
+            obj.lotes.filter(stocks__cantidad__gt=0).exists()
+            or obj.lotes.filter(movimientos_farmacia__isnull=False).exists()
+        ):
+            return ("unidad_medida",)
+        return ()
 
     search_fields = (
         "articulo__nombre",
@@ -70,7 +79,7 @@ class DetalleMovimientoInline(admin.TabularInline):
     model = DetalleMovimientoFarmacia
     extra = 0
     can_delete = False
-    readonly_fields = ("lote", "cantidad")
+    readonly_fields = ("lote", "cantidad", "numero_lote_registrado", "vencimiento_registrado", "unidad_registrada", "codigo_registrado", "nombre_registrado")
 
     def has_add_permission(self, request, obj):
         return False
@@ -93,12 +102,70 @@ class MovimientoFarmaciaAdmin(admin.ModelAdmin):
         "anexo_destino",
         "usuario",
         "motivo",
+        "proveedor", "documento_recepcion", "fecha_recepcion", "importacion", "fila_importacion", "clave_recepcion", "documento_traslado", "clave_traslado",
         "fecha",
     )
+
+    search_fields = ("proveedor", "documento_recepcion", "documento_traslado", "importacion__nombre_archivo", "detalles__lote__numero_lote")
 
     inlines = [DetalleMovimientoInline]
 
     def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+from .models import ImportacionMedicamentos
+
+
+@admin.register(ImportacionMedicamentos)
+class ImportacionMedicamentosAdmin(admin.ModelAdmin):
+    list_display = ("nombre_archivo", "usuario", "estado", "cantidad_importada", "cantidad_omitidas", "creada_at", "importada_at")
+    list_filter = ("estado", "creada_at")
+    search_fields = ("nombre_archivo", "usuario__email")
+    readonly_fields = ("id", "usuario", "nombre_archivo", "archivo_sha256", "filas", "estado", "modalidad", "cantidad_importada", "cantidad_movimientos", "cantidad_lotes_creados", "cantidad_unidades", "creada_at", "importada_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+from .models import ConfiguracionFarmacia
+
+
+@admin.register(ConfiguracionFarmacia)
+class ConfiguracionFarmaciaAdmin(admin.ModelAdmin):
+    list_display = ("bodega_central",)
+    readonly_fields = ("bodega_central",)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+from .models import StockPendienteFarmacia
+
+
+@admin.register(StockPendienteFarmacia)
+class StockPendienteFarmaciaAdmin(admin.ModelAdmin):
+    list_display = ("articulo", "anexo", "cantidad", "creado_at")
+    readonly_fields = ("stock_original", "articulo", "anexo", "cantidad", "usuario", "movimiento_regularizacion", "motivo", "respaldo", "creado_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False
 
     def has_delete_permission(self, request, obj=None):

@@ -1,68 +1,26 @@
-
-{% extends "base.html" %}
-
-{% block title %}
-Registrar Entrada - Farmacia
-{% endblock %}
-
-{% block content %}
-
-<h1>Registrar entrada de medicamentos</h1>
-
-<div class="card">
-
-    <h3>Datos del ingreso</h3>
-
-    <p>
-        Registre los medicamentos recibidos,
-        indicando el lote, vencimiento y ubicación.
-    </p>
-
-    <form method="post">
-
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {{ form.non_field_errors }}
-            </div>
-        {% endif %}
-
+{% extends "farmacia/_form_base.html" %}
+{% load static %}
+{% block inventory_description %}Reciba medicamentos en Bodega Central, indicando lote, proveedor y documento de recepción. Para distribuirlos, utilice Trasladar a anexo. El vencimiento se conserva desde el lote.{% endblock %}
+{% block inventory_body %}
+<a class="inventory-back-link" href="{% url 'farmacia:dashboard' %}">‹ Volver a existencias</a>
+<form method="post" class="inventory-form" id="entrada-farmacia-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="inventory-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="inventory-form-fields">
         {% for field in form %}
-
-            <div class="form-group">
-
-                <label for="{{ field.id_for_label }}">
-                    {{ field.label }}
-                </label>
-
-                {{ field }}
-
-                {% if field.errors %}
-                    <div class="error">
-                        {{ field.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-        {% endfor %}
-
-        <div class="form-actions">
-
-            <button type="submit" class="btn">
-                Registrar entrada
-            </button>
-
-            <a href="{% url 'farmacia:dashboard' %}"
-               class="btn">
-                Cancelar
-            </a>
-
+        {% if field.name == 'medicamento' %}<div class="inventory-field inventory-field-wide"><label for="buscar-medicamento">Buscar medicamento por nombre</label><input type="search" id="buscar-medicamento" placeholder="Escriba parte del nombre" autocomplete="off" aria-controls="id_medicamento" aria-describedby="medicamento-resultados"><p id="medicamento-resultados" class="inventory-field-help" role="status"></p></div>{% endif %}
+        <div class="inventory-field{% if field.name == 'motivo' %} inventory-field-wide{% endif %}">
+            {{ field.label_tag }}{{ field }}
+            {% if field.name == 'lote' %}<p id="lote-ayuda" class="inventory-field-help" role="status">Elija el medicamento para cargar sus lotes activos sin vencer.</p>{% endif %}
+            {% if field.errors %}<div id="{{ field.auto_id }}_error">{% for error in field.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}</div>{% endif %}
         </div>
-
-    </form>
-
-</div>
-
+        {% endfor %}
+    </div>
+    <div class="inventory-preview" aria-live="polite"><strong>Vista previa de la entrada</strong><p id="farmacia-entrada-saldo">Seleccione medicamento, lote y ubicación para consultar las existencias.</p><small>El saldo es orientativo y se valida nuevamente al guardar.</small></div>
+    <div class="inventory-form-actions"><button class="inventory-button inventory-primary" type="submit" id="registrar-entrada">Registrar entrada</button><a class="inventory-button" href="{% url 'farmacia:dashboard' %}">Cancelar</a></div>
+</form>
+{{ lotes_disponibles|json_script:"lotes-disponibles" }}
+{{ stocks_entrada|json_script:"stocks-entrada" }}
+{{ unidades_medicamentos|json_script:"unidades-medicamentos" }}
 {% endblock %}
+{% block inventory_scripts %}<script src="{% static 'js/entrada_farmacia.js' %}" defer></script>{% endblock %}

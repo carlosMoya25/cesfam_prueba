@@ -1,0 +1,20 @@
+<div class="inventory-table-shell"><div class="inventory-table-scroll"><table class="inventory-table farmacia-stock-table">
+    <caption class="inventory-sr-only">Existencias de medicamentos por lote y ubicación</caption>
+    <thead><tr><th scope="col">Medicamento</th><th scope="col">Lote</th><th scope="col">Ubicación</th><th scope="col">Vencimiento</th><th scope="col" class="inventory-number">Cantidad</th><th scope="col">Estado</th><th scope="col"><span class="inventory-sr-only">Acciones</span></th></tr></thead>
+    <tbody>{% for stock in stocks %}
+    <tr>
+        <td><strong>{{ stock.lote.medicamento.articulo.nombre }}</strong><small>{{ stock.lote.medicamento.concentracion }} · {{ stock.lote.medicamento.forma_farmaceutica }}</small></td>
+        <td>{{ stock.lote.numero_lote }}{% if not stock.lote.activo %}<small>Lote inactivo</small>{% endif %}</td>
+        <td>{{ stock.anexo.nombre }}{% if not stock.anexo.activo %}<small>Ubicación inactiva</small>{% endif %}</td>
+        <td>{{ stock.lote.fecha_vencimiento|date:"d/m/Y" }}</td><td class="inventory-number">{{ stock.cantidad }}<small>{{ stock.lote.medicamento.unidad_medida|default:"Unidad sin definir" }}</small></td>
+        <td>{% include "farmacia/_estado_lote.html" %}</td>
+        <td class="inventory-row-action">
+        {% if stock.lote.activo and stock.lote.medicamento.activo and stock.lote.medicamento.articulo.activo and stock.anexo.activo and stock.lote.fecha_vencimiento >= hoy %}
+            <details class="inventory-dropdown inventory-row-dropdown"><summary aria-label="Acciones para {{ stock.lote.medicamento.articulo.nombre }}, lote {{ stock.lote.numero_lote }} en {{ stock.anexo.nombre }}">Acciones <span aria-hidden="true">⌄</span></summary>
+                <div class="inventory-dropdown-menu"><a href="{% url 'farmacia:detalle_medicamento' stock.lote.medicamento_id %}{% if navegacion_query %}?{{ navegacion_query }}{% endif %}">Ver medicamento</a>{% if stock.anexo_id == bodega_central_id %}<a href="{% url 'farmacia:registrar_entrada' %}?medicamento={{ stock.lote.medicamento_id }}&amp;anexo={{ stock.anexo_id }}&amp;lote={{ stock.lote_id }}">Registrar entrada</a>{% if stock.cantidad > 0 %}<a href="{% url 'farmacia:trasladar_a_anexo' %}?lote={{ stock.lote_id }}">Trasladar a anexo</a>{% endif %}{% endif %}</div>
+            </details>
+        {% else %}<a class="inventory-text-link" href="{% url 'farmacia:detalle_medicamento' stock.lote.medicamento_id %}{% if navegacion_query %}?{{ navegacion_query }}{% endif %}">Ver detalle</a>{% endif %}
+        </td>
+    </tr>
+    {% empty %}<tr><td colspan="7" class="inventory-empty"><strong>No se encontraron existencias</strong><p>Pruebe otros filtros o registre una entrada para un lote existente.</p><a href="{{ request.path }}">Limpiar filtros</a></td></tr>{% endfor %}</tbody>
+</table></div>{% include "farmacia/_paginacion.html" %}</div>

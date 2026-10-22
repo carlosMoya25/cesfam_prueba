@@ -1,0 +1,16 @@
+{% extends "inventario/_base.html" %}
+{% block inventory_actions %}
+<div class="inventory-actions" aria-label="Operaciones de inventario">
+    <a class="inventory-button inventory-primary" href="{% url 'inventario:entrada' %}"><span aria-hidden="true">＋</span> Registrar entrada</a>
+    <a class="inventory-button" href="{% url 'inventario:salida' %}"><span aria-hidden="true">−</span> Registrar salida</a>
+    <a class="inventory-button" href="{% url 'inventario:transferencia' %}"><span aria-hidden="true">⇄</span> Transferir</a>
+    <a class="inventory-button" href="{% url 'inventario:crear_departamento' %}">Crear departamento</a>
+    <a class="inventory-button" href="{% url 'inventario:crear_ubicacion' %}">Crear ubicación</a>
+</div>
+{% endblock %}
+{% block inventory_navigation %}
+<nav class="inventory-tabs" aria-label="Secciones de inventario">
+    <a href="{% url 'inventario:panel' %}{% if navegacion_query %}?{{ navegacion_query }}{% endif %}"{% if not es_historial %} aria-current="page"{% endif %}>Existencias</a>
+    <a href="{% url 'inventario:historial' %}{% if navegacion_query %}?{{ navegacion_query }}{% endif %}"{% if es_historial %} aria-current="page"{% endif %}>Historial</a>
+</nav>
+{% endblock %}

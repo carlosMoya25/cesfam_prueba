@@ -1,0 +1,13 @@
+{% if form.non_field_errors %}<div class="inventory-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="inventory-form-fields">
+{% for field in form %}
+    {% if operacion and field.name == "articulo" %}
+    <div class="inventory-field inventory-field-wide"><label for="inv-buscar">Buscar artículo</label><input type="search" id="inv-buscar" placeholder="Nombre o código" aria-controls="id_articulo"><p id="inv-resultados" class="inventory-field-help" role="status"></p></div>
+    {% endif %}
+    <div class="inventory-field{% if field.field.widget.input_type == 'checkbox' %} inventory-field-check inventory-field-wide{% elif field.name == 'descripcion' or field.name == 'motivo' %} inventory-field-wide{% endif %}">
+        {% if field.field.widget.input_type == 'checkbox' %}{{ field }}{{ field.label_tag }}{% else %}{{ field.label_tag }}{{ field }}{% endif %}
+        {% if field.help_text %}<p class="inventory-field-help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}<div id="{{ field.auto_id }}_error">{% for error in field.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}</div>{% endif %}
+    </div>
+{% endfor %}
+</div>

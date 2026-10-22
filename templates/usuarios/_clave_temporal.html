@@ -1,0 +1,16 @@
+{% if form.advertencias_clave %}
+<div class="alert alert-error" role="alert">
+    <strong>Esta contraseña no cumple los siguientes requisitos:</strong>
+    <ul>{% for aviso in form.advertencias_clave %}<li>{{ aviso }}</li>{% endfor %}</ul>
+    <p>Para autorizarla como temporal, vuelva a escribirla en ambos campos y marque la confirmación. La autorización se registrará y el usuario tendrá que cambiarla antes de utilizar el sistema.</p>
+</div>
+{% endif %}
+<div class="form-grid">
+    <div class="form-group">{{ form.clave1.label_tag }}{{ form.clave1 }}{{ form.clave1.errors }}</div>
+    <div class="form-group">{{ form.clave2.label_tag }}{{ form.clave2 }}{{ form.clave2.errors }}</div>
+</div>
+{% if form.advertencias_clave %}
+<input type="hidden" name="autorizacion_clave" value="{{ form.token_autorizacion }}">
+<label class="admin-active-option"><input type="checkbox" name="autorizar_clave_debil" value="on">{{ form.autorizar_clave_debil.label }}</label>
+{% endif %}
+<p class="inventory-footnote">La contraseña es exclusiva de este sistema. No modifica la contraseña de Gmail. No deje claves temporales en observaciones ni mensajes del historial.</p>

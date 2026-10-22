@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, organizacion_views
 
 
 app_name = "inventario"
@@ -8,6 +8,8 @@ app_name = "inventario"
 
 urlpatterns = [
     path("", views.panel_inventario, name="panel"),
+    path("departamentos/nuevo/", organizacion_views.crear_departamento, name="crear_departamento"),
+    path("ubicaciones/nueva/", organizacion_views.crear_ubicacion, name="crear_ubicacion"),
     path("entrada/", views.entrada_inventario, name="entrada"),
     path("salida/", views.salida_inventario, name="salida"),
     path(

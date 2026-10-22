@@ -10,6 +10,12 @@ from .models import HistorialAdministracion
 
 # pyrefly: ignore [missing-import]
 from .forms import UsuarioAdminForm
+from .claves import registrar_evento_clave
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
 
 
 from .models import HistorialSeguridad
@@ -192,11 +198,7 @@ def desbloquear_usuario(request, pk):
 def panel_administracion(request):
 
     if not es_administrador(request.user):
-        messages.error(
-            request,
-            "No tienes permisos para acceder a la administración."
-        )
-        return redirect("dashboard")
+        return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
 
     usuarios = Usuario.objects.all()
 
@@ -238,11 +240,7 @@ def panel_administracion(request):
 def lista_usuarios(request):
 
     if not es_administrador(request.user):
-        messages.error(
-            request,
-            "No tienes permisos para acceder a la administración."
-        )
-        return redirect("dashboard")
+        return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
 
     usuarios = (
         Usuario.objects
@@ -350,11 +348,7 @@ def lista_usuarios(request):
 
 
     if not es_administrador(request.user):
-        messages.error(
-            request,
-            "No tienes permisos para acceder a la administración."
-        )
-        return redirect("dashboard")
+        return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
 
     if request.method == "POST":
 
@@ -399,22 +393,27 @@ def lista_usuarios(request):
 # CREAR USUARIO
 # ==========================================================
 
+@sensitive_post_parameters()
+@never_cache
+@login_required
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
 def crear_usuario(request):
 
     if not es_administrador(request.user):
-        messages.error(
-            request,
-            "No tienes permisos para acceder a la administración."
-        )
-        return redirect("dashboard")
+        return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
 
     if request.method == "POST":
 
-        form = UsuarioAdminForm(request.POST)
+        form = UsuarioAdminForm(request.POST, administrador=request.user)
 
         if form.is_valid():
 
             usuario = form.save()
+            if usuario.has_usable_password():
+                registrar_evento_clave(usuario=usuario, realizado_por=request.user,
+                    accion="Se habilitó el acceso con contraseña temporal; el usuario deberá cambiarla al ingresar.",
+                    advertencias=form.advertencias_clave)
 
             # --------------------------------------------------
             # HISTORIAL ADMINISTRATIVO
@@ -472,11 +471,7 @@ def crear_usuario(request):
 def detalle_usuario(request, pk):
 
     if not es_administrador(request.user):
-        messages.error(
-            request,
-            "No tienes permisos para acceder a la administración."
-        )
-        return redirect("dashboard")
+        return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
 
     usuario = get_object_or_404(
         Usuario.objects
@@ -510,11 +505,7 @@ def detalle_usuario(request, pk):
 def editar_usuario(request, pk):
 
     if not es_administrador(request.user):
-        messages.error(
-            request,
-            "No tienes permisos para acceder a la administración."
-        )
-        return redirect("dashboard")
+        return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
 
     usuario = get_object_or_404(
         Usuario,
@@ -670,11 +661,7 @@ def editar_usuario(request, pk):
 def cambiar_estado_usuario(request, pk):
 
     if not es_administrador(request.user):
-        messages.error(
-            request,
-            "No tienes permisos para realizar esta acción."
-        )
-        return redirect("dashboard")
+        return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
 
     usuario = get_object_or_404(
         Usuario,
@@ -813,13 +800,7 @@ def cambiar_estado_usuario(request, pk):
 def historial_administracion(request):
 
     if not es_administrador(request.user):
-
-        messages.error(
-            request,
-            "No tienes permisos para acceder al historial administrativo."
-        )
-
-        return redirect("dashboard")
+        return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
 
     historial = (
         HistorialAdministracion.objects

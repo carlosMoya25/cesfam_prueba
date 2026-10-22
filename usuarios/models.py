@@ -49,6 +49,8 @@ class Usuario(AbstractUser):
         related_name="usuarios"
     )
 
+    debe_cambiar_clave = models.BooleanField(default=False, verbose_name="Debe cambiar su contraseña temporal")
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["nombres", "apellido_paterno"]
     objects = UsuarioManager()

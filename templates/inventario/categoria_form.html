@@ -1,31 +1,10 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-<div class="card">
-
-    <h2>{{ titulo }}</h2>
-
-    <p>
-        Complete los datos de la categoría de inventario.
-    </p>
-
-    <form method="post">
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <div style="margin-top:20px;">
-            <button type="submit" class="btn">
-                Guardar
-            </button>
-
-            <a href="{% url 'inventario:categorias' %}" class="btn">
-                Cancelar
-            </a>
-        </div>
-    </form>
-
-</div>
-
+{% extends "inventario/_form_base.html" %}
+{% block inventory_description %}Defina un nombre y una descripción para identificar esta categoría.{% endblock %}
+{% block inventory_body %}
+<a class="inventory-back-link" href="{% url 'inventario:categorias' %}">‹ Volver a categorías</a>
+<form method="post" class="inventory-form">
+    {% csrf_token %}
+    {% include "inventario/_form_fields.html" %}
+    <div class="inventory-form-actions"><button type="submit" class="inventory-button inventory-primary">Guardar categoría</button><a href="{% url 'inventario:categorias' %}" class="inventory-button">Cancelar</a></div>
+</form>
 {% endblock %}

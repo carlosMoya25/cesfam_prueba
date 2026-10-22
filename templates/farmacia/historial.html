@@ -1,0 +1,15 @@
+{% extends "farmacia/_base.html" %}
+{% block inventory_body %}
+{% include "farmacia/_filtros.html" %}
+<div class="inventory-table-shell"><div class="inventory-table-scroll"><table class="inventory-table inventory-history">
+    <caption class="inventory-sr-only">Historial y trazabilidad de movimientos de farmacia</caption>
+    <thead><tr><th scope="col">Movimiento / registro</th><th scope="col">Medicamentos y lotes</th><th scope="col">Origen → destino</th><th scope="col">Recepción / respaldo</th><th scope="col">Responsable / observaciones</th></tr></thead>
+    <tbody>{% for movimiento in movimientos %}<tr>
+        <td><strong>#{{ movimiento.pk }} · {{ movimiento.get_tipo_display }}</strong><small>Registrado: {{ movimiento.fecha|date:"d/m/Y H:i" }}</small>{% if movimiento.importacion_id %}<small>CSV: {{ movimiento.importacion.nombre_archivo }} · Fila {{ movimiento.fila_importacion }}</small>{% else %}<small>Registro manual</small>{% endif %}</td>
+        <td>{% for detalle in movimiento.detalles.all %}<div>{{ detalle.nombre_registrado|default:detalle.lote.medicamento.articulo.nombre }} <strong>× {{ detalle.cantidad }}</strong><small>{{ detalle.unidad_registrada|default:"Unidad histórica no registrada" }}</small><small>Lote {{ detalle.numero_lote_registrado|default:detalle.lote.numero_lote }}</small><small>{% if detalle.vencimiento_registrado %}Vencimiento registrado: {{ detalle.vencimiento_registrado|date:"d/m/Y" }}{% else %}Vencimiento histórico no registrado{% endif %}</small></div>{% endfor %}</td>
+        <td>{{ movimiento.anexo_origen.nombre|default:"—" }} → {{ movimiento.anexo_destino.nombre|default:"—" }}</td>
+        <td>{% if movimiento.tipo == 'TRANSFERENCIA' %}<strong>Traslado interno</strong><small>Documento: {{ movimiento.documento_traslado|default:"No registrado" }}</small>{% elif movimiento.proveedor %}<strong>{{ movimiento.proveedor }}</strong><small>Documento: {{ movimiento.documento_recepcion }}</small><small>Recepción: {{ movimiento.fecha_recepcion|date:"d/m/Y" }}</small>{% else %}<span class="inventory-muted">Datos de recepción no registrados</span>{% endif %}</td><td>{{ movimiento.usuario.email }}<small>{{ movimiento.motivo|default:"Sin observaciones" }}</small></td>
+    </tr>{% empty %}<tr><td colspan="5" class="inventory-empty"><strong>No se encontraron movimientos</strong><p>Revise las fechas o limpie los filtros.</p></td></tr>{% endfor %}</tbody>
+</table></div>{% include "farmacia/_paginacion.html" %}</div>
+<p class="inventory-footnote">Los registros anteriores pueden no tener datos de recepción ni una copia histórica del lote. Los filtros de estado, vencimiento y existencias se refieren a la situación actual. Desde y Hasta corresponden al registro del movimiento.</p>
+{% endblock %}

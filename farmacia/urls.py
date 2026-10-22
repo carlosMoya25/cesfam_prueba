@@ -1,10 +1,17 @@
 
 from django.urls import path
-from . import views
+from . import views, importacion_views, traslados
 
 app_name = "farmacia"
 
 urlpatterns = [
+    path("pendientes/", views.pendientes_conciliacion, name="pendientes_conciliacion"),
+    path("importar/", importacion_views.importar_csv, name="importar_csv"),
+    path("importar/plantilla/", importacion_views.plantilla_csv, name="plantilla_csv"),
+    path("importar/<uuid:pk>/reporte/", importacion_views.reporte_importacion, name="reporte_importacion"),
+    path("importar/<uuid:pk>/", importacion_views.revisar_importacion, name="revisar_importacion"),
+    path("traslados/nuevo/", traslados.trasladar_a_anexo, name="trasladar_a_anexo"),
+    path("historial/", views.historial, name="historial"),
     path(
         "",
         views.dashboard,

@@ -1,0 +1,17 @@
+{% extends "farmacia/_base.html" %}
+{% block inventory_heading %}Pendientes de conciliación{% endblock %}
+{% block inventory_description %}Registros antiguos conservados para verificar su identidad, unidad y lote.{% endblock %}
+{% block inventory_actions %}{% endblock %}
+{% block inventory_body %}
+<div class="inventory-preview"><strong>Estos saldos no son existencias disponibles por lote.</strong><p>Se retiraron del inventario general conservando su cantidad e historial. No se sumaron a Farmacia ni se descartaron como duplicados. Antes de incorporarlos, verifique si corresponden a existencias adicionales o ya contabilizadas, su medicamento, unidad, lote y vencimiento.</p></div>
+<div class="inventory-table-shell"><div class="inventory-table-scroll"><table class="inventory-table">
+    <thead><tr><th>Artículo / código</th><th>Ubicación registrada</th><th class="inventory-number">Cantidad pendiente</th><th>Qué debe revisar</th><th>Trazabilidad</th></tr></thead>
+    <tbody>{% for pendiente in pendientes %}<tr>
+        <td><strong>{{ pendiente.articulo.nombre }}</strong><small>{{ pendiente.articulo.codigo }}</small></td>
+        <td>{{ pendiente.anexo.nombre }}<small>Ubicación histórica; no implica un traslado físico.</small></td>
+        <td class="inventory-number">{{ pendiente.cantidad }}<small>Unidad de medida pendiente de verificar</small></td>
+        <td>{{ pendiente.motivo }}</td>
+        <td>{{ pendiente.creado_at|date:"d/m/Y H:i" }}<small>{{ pendiente.usuario.email }}</small><small>Regularización #{{ pendiente.movimiento_regularizacion_id }} · Stock original #{{ pendiente.stock_original_id }}</small></td>
+    </tr>{% empty %}<tr><td colspan="5">No hay saldos pendientes de conciliación.</td></tr>{% endfor %}</tbody>
+</table></div>{% include "farmacia/_paginacion.html" %}</div>
+{% endblock %}

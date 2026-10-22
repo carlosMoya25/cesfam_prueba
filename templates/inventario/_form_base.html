@@ -1,0 +1,5 @@
+{% extends "inventario/_base.html" %}
+{% block inventory_heading %}{{ titulo }}{% endblock %}
+{% block inventory_breadcrumb %}<a href="{% url 'inventario:panel' %}">Inventario</a><span aria-hidden="true">/</span><span>{{ titulo }}</span>{% endblock %}
+{% block inventory_admin %}{% endblock %}
+{% block inventory_navigation %}{% endblock %}

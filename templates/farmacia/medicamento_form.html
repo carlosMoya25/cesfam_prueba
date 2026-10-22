@@ -1,50 +1,26 @@
-
-{% extends "base.html" %}
-
-{% block content %}
-
-<h1>{{ titulo }}</h1>
-
-<div class="card">
-
-    <form method="post">
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {{ form.non_field_errors }}
-            </div>
-        {% endif %}
-
-        {% for field in form %}
-        <div class="form-group">
-
-            <label for="{{ field.id_for_label }}">
-                {{ field.label }}
-            </label>
-
-            {{ field }}
-
-            {% if field.errors %}
-                <div class="error">
-                    {{ field.errors }}
-                </div>
-            {% endif %}
-
+{% extends "farmacia/_form_base.html" %}
+{% block inventory_description %}{% if registro_con_recepcion %}Registre el medicamento, su lote y la recepción inicial en Bodega Central. Después podrá trasladar unidades a los anexos.{% else %}Actualice la ficha del medicamento. Las recepciones y sus respaldos se consultan en el historial.{% endif %}{% endblock %}
+{% block inventory_body %}
+<a class="inventory-back-link" href="{% url 'farmacia:lista_medicamentos' %}">‹ Volver a medicamentos</a>
+{% if registro_con_recepcion %}<p class="inventory-footnote">¿El medicamento ya existe? <a class="inventory-text-link" href="{% url 'farmacia:registrar_entrada' %}">Registrar una entrada del medicamento existente</a>.</p>{% endif %}
+<form method="post" class="inventory-form">
+    {% csrf_token %}
+    {% if registro_con_recepcion %}
+    <p class="inventory-footnote">Los campos sin la indicación «Opcional» son obligatorios. La cantidad se registra en la unidad de medida indicada, sin conversiones automáticas.</p>
+    {% if form.non_field_errors %}<div class="inventory-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    {% for titulo_seccion, campos in form.secciones %}
+    <fieldset class="farmacia-registration-section"><legend>{{ titulo_seccion }}</legend><div class="inventory-form-fields">
+        {% for field in campos %}
+        <div class="inventory-field{% if field.name == 'descripcion' or field.name == 'observaciones' %} inventory-field-wide{% endif %}">
+            {{ field.label_tag }}{% if not field.field.required %}<small class="inventory-field-help">Opcional</small>{% endif %}{{ field }}
+            {% if field.help_text %}<p class="inventory-field-help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
+            {% if field.errors %}<div id="{{ field.auto_id }}_error">{% for error in field.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}</div>{% endif %}
         </div>
         {% endfor %}
-
-        <button type="submit" class="btn">
-            Guardar medicamento
-        </button>
-
-        <a href="{% url 'farmacia:lista_medicamentos' %}"
-           class="btn">
-            Cancelar
-        </a>
-
-    </form>
-
-</div>
-
+    </div></fieldset>
+    {% endfor %}
+    <p class="inventory-footnote">Al guardar se registrarán juntos la ficha, el lote, las existencias y la recepción. Si ocurre un error, no se guardará ningún cambio.</p>
+    {% else %}{% include "inventario/_form_fields.html" %}{% endif %}
+    <div class="inventory-form-actions"><button class="inventory-button inventory-primary" type="submit">{% if registro_con_recepcion %}Guardar medicamento y recepción{% else %}Guardar medicamento{% endif %}</button><a class="inventory-button" href="{% url 'farmacia:lista_medicamentos' %}">Cancelar</a></div>
+</form>
 {% endblock %}

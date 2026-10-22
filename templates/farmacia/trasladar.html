@@ -1,0 +1,36 @@
+{% extends "farmacia/_form_base.html" %}
+{% load static %}
+{% block inventory_description %}Distribuya unidades desde Bodega Central a un anexo, conservando el mismo lote y vencimiento.{% endblock %}
+{% block inventory_body %}
+<a class="inventory-back-link" href="{% url 'farmacia:dashboard' %}">‹ Volver a existencias</a>
+<p class="inventory-footnote">Origen fijo: <strong>Bodega Central</strong>. Solo aparecen lotes activos, sin vencer y con existencias disponibles. Las cantidades se expresan en la unidad de stock del medicamento.</p>
+<form method="post" class="inventory-form">
+    {% csrf_token %}{% for hidden in form.hidden_fields %}{{ hidden }}{{ hidden.errors }}{% endfor %}
+    {% if form.non_field_errors %}<div class="inventory-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="inventory-form-fields">
+        <div class="inventory-field inventory-field-wide farmacia-autocomplete">
+            <label for="buscar-lote-traslado">Buscar por nombre, código o lote</label>
+            <div class="farmacia-autocomplete-input"><input type="search" id="buscar-lote-traslado" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugerencias-traslado" aria-describedby="resultados-traslado" autocomplete="off" placeholder="Escriba para ver medicamentos y stock disponible">
+            <ul id="sugerencias-traslado" class="farmacia-suggestions" role="listbox" aria-label="Medicamentos y lotes disponibles" hidden></ul></div>
+            <p id="resultados-traslado" class="inventory-field-help" role="status">Puede buscar por nombre o elegir directamente en Medicamento y lote.</p>
+        </div>
+        {% for field in form.visible_fields %}<div class="inventory-field{% if field.name == 'motivo' %} inventory-field-wide{% endif %}">
+            {{ field.label_tag }}{{ field }}
+            {% if field.help_text %}<p class="inventory-field-help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
+            {% if field.errors %}<div id="{{ field.auto_id }}_error">{% for error in field.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}</div>{% endif %}
+        </div>{% endfor %}
+    </div>
+    <div class="inventory-preview"><strong>Stock del lote seleccionado</strong>
+        <dl class="farmacia-transfer-balances" aria-live="polite" aria-atomic="true">
+            <div><dt>Disponible en Bodega Central</dt><dd id="stock-bodega-traslado">—</dd></div>
+            <div><dt>Stock actual en el anexo</dt><dd id="stock-anexo-traslado">—</dd></div>
+            <div><dt>Bodega después del traslado</dt><dd id="stock-bodega-despues">—</dd></div>
+            <div><dt>Anexo después del traslado</dt><dd id="stock-anexo-despues">—</dd></div>
+        </dl>
+        <p id="saldo-traslado" role="status">Seleccione medicamento y lote para consultar sus existencias.</p><small>Se descontará de bodega y se sumará al anexo en una sola operación. El saldo se comprueba nuevamente al guardar.</small></div>
+    <div class="inventory-form-actions"><button class="inventory-button inventory-primary" type="submit" id="confirmar-traslado">Confirmar traslado</button><a class="inventory-button" href="{% url 'farmacia:dashboard' %}">Cancelar</a></div>
+</form>
+{{ stocks_traslado|json_script:"stocks-traslado" }}
+{{ stocks_anexos|json_script:"stocks-anexos-traslado" }}
+{% endblock %}
+{% block inventory_scripts %}<script src="{% static 'js/traslado_farmacia.js' %}" defer></script>{% endblock %}

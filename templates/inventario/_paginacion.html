@@ -1,0 +1,11 @@
+<div class="inventory-pagination">
+    <span role="status">{% if pagina.paginator.count %}Mostrando {{ pagina.start_index }}–{{ pagina.end_index }} de {{ pagina.paginator.count }}{% else %}Sin resultados{% endif %}</span>
+    {% if pagina.paginator.num_pages > 1 %}
+    <nav aria-label="Páginas de resultados">
+        {% if pagina.has_previous %}<a href="?{% if filtros_query %}{{ filtros_query }}&amp;{% endif %}page={{ pagina.previous_page_number }}" rel="prev">‹ Anterior</a>{% endif %}
+        <span class="inventory-page-current">{{ pagina.number }}</span><span>de {{ pagina.paginator.num_pages }}</span>
+        {% if pagina.has_next %}<a href="?{% if filtros_query %}{{ filtros_query }}&amp;{% endif %}page={{ pagina.next_page_number }}" rel="next">Siguiente ›</a>{% endif %}
+        <span class="inventory-sr-only">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+    </nav>
+    {% endif %}
+</div>

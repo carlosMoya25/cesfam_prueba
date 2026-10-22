@@ -1,0 +1,17 @@
+<form method="get" class="inventory-search" role="search">
+    {% for field in filtros_form %}{% if field.is_hidden %}{{ field }}{% for error in field.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}{% endif %}{% endfor %}
+    <div class="inventory-search-row">
+        <div class="inventory-search-input"><label class="inventory-sr-only" for="{{ filtros_form.q.id_for_label }}">Buscar medicamento, principio activo o código</label><span aria-hidden="true">⌕</span>{{ filtros_form.q }}</div>
+        <div class="inventory-location"><label class="inventory-sr-only" for="{{ filtros_form.ubicacion.id_for_label }}">Ubicación</label>{{ filtros_form.ubicacion }}</div>
+        <button class="inventory-button" type="submit">Buscar</button>
+        <details class="inventory-filters-toggle"{% if filtros_expandidos %} open{% endif %}>
+            <summary class="inventory-button"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 7h16M4 17h16M8 4v6M16 14v6"/></svg>Filtros{% if filtros_expandidos %}<span class="inventory-filter-dot" aria-hidden="true"></span>{% endif %}</summary>
+            <div class="inventory-extra-filters">
+                {% for field in filtros_form %}{% if field.name != 'q' and field.name != 'ubicacion' and not field.is_hidden %}<div>{{ field.label_tag }}{{ field }}{% for error in field.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}</div>{% endif %}{% endfor %}
+                <button class="inventory-button inventory-primary" type="submit">Aplicar filtros</button>
+            </div>
+        </details>
+    </div>
+    {% for error in filtros_form.q.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}{% for error in filtros_form.ubicacion.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}
+    <div class="inventory-search-context"><span role="status">{% if filtros_form.cleaned_data.importacion %}Carga CSV seleccionada · {% endif %}{{ pagina.paginator.count }} resultado{{ pagina.paginator.count|pluralize:"s" }}{% if filtros_form.cleaned_data.ubicacion %} · {{ filtros_form.cleaned_data.ubicacion.nombre }}{% else %} · Todas las ubicaciones{% endif %}{% if filtros_form.cleaned_data.q %} · «{{ filtros_form.cleaned_data.q }}»{% endif %}</span>{% if filtros_query %}<a href="{{ request.path }}">Limpiar filtros</a>{% endif %}</div>
+</form>

@@ -1,8 +1,11 @@
+from copy import copy
+
 from django import forms
 from django.contrib.auth.models import Group
 
 from organizacion.models import Anexo, Departamento
 from .models import Usuario
+from .claves import campos_clave_temporal, validar_clave_temporal
 
 
 class UsuarioAdminForm(forms.ModelForm):
@@ -70,8 +73,16 @@ class UsuarioAdminForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, administrador=None, **kwargs):
+        self.administrador = administrador
+        self.advertencias_clave = []
+        self.token_autorizacion = ""
         super().__init__(*args, **kwargs)
+        if not self.instance.pk:
+            self.fields["modo_acceso"] = forms.ChoiceField(label="Forma de acceso", initial="google", choices=[
+                ("google", "Mediante Google"), ("clave", "Con contraseña y Google"),
+            ])
+            self.fields.update(campos_clave_temporal())
 
         # Roles disponibles
         self.fields["roles"].queryset = Group.objects.order_by("name")
@@ -112,15 +123,26 @@ class UsuarioAdminForm(forms.ModelForm):
 
         return email
 
+    def clean(self):
+        datos = super().clean()
+        if not self.instance.pk and datos.get("modo_acceso") == "clave":
+            candidato = copy(self.instance)
+            for campo in ("email", "nombres", "apellido_paterno", "apellido_materno"):
+                setattr(candidato, campo, datos.get(campo, ""))
+            validar_clave_temporal(self, usuario=candidato, administrador=self.administrador)
+        return datos
+
     def save(self, commit=True):
         usuario = super().save(commit=False)
 
         usuario.email = self.cleaned_data["email"].strip().lower()
 
-        # Los nuevos usuarios creados desde Administración
-        # podrán autenticarse inicialmente mediante Google.
         if not usuario.pk:
-            usuario.set_unusable_password()
+            if self.cleaned_data.get("modo_acceso") == "clave":
+                usuario.set_password(self.cleaned_data["clave1"])
+                usuario.debe_cambiar_clave = True
+            else:
+                usuario.set_unusable_password()
 
         if commit:
             usuario.save()

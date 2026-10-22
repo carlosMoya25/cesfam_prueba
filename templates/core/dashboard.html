@@ -385,6 +385,38 @@ Dashboard | CESFAM San Pedro
 
 
 
+{% if puede_gestionar_farmacia %}
+<h2>Farmacia</h2>
+<div class="dashboard-grid">
+    <a href="{% url 'farmacia:lista_medicamentos' %}" class="stat-card stat-info dashboard-link-card">
+        <div class="stat-card-content">
+            <div class="stat-label">Medicamentos activos</div>
+            <div class="stat-number">{{ total_medicamentos }}</div>
+        </div>
+    </a>
+    <div class="stat-card stat-success">
+        <div>
+            <div class="stat-label">Unidades utilizables</div>
+            <div class="stat-number">{{ unidades_farmacia }}</div>
+            <div class="stat-label">Lotes activos y sin vencer</div>
+        </div>
+    </div>
+    <div class="stat-card stat-danger">
+        <div>
+            <div class="stat-label">Lotes vencidos con existencias</div>
+            <div class="stat-number">{{ lotes_vencidos }}</div>
+        </div>
+    </div>
+</div>
+{% if stock_medicamentos_sin_lote and user.is_superuser %}
+<div class="card" role="alert">
+    Hay existencias de medicamentos registradas en inventario general sin lote.
+    Deben conciliarse antes de utilizar el stock de farmacia como saldo completo.
+</div>
+{% endif %}
+
+{% endif %}
+
 <!-- =========================================================
      ACCESOS RÁPIDOS
      ========================================================= -->
@@ -519,6 +551,25 @@ Dashboard | CESFAM San Pedro
 
         </a>
 
+        {% endif %}
+
+        {% if puede_gestionar_farmacia %}
+        <a href="{% url 'farmacia:dashboard' %}" class="stat-card stat-success dashboard-link-card">
+            <div class="stat-icon">✚</div>
+            <div class="stat-card-content">
+                <strong>Farmacia</strong>
+                <div class="stat-label">Medicamentos, lotes y existencias</div>
+            </div>
+            <span class="stat-card-arrow">›</span>
+        </a>
+        <a href="{% url 'farmacia:registrar_entrada' %}" class="stat-card stat-info dashboard-link-card">
+            <div class="stat-icon">+</div>
+            <div class="stat-card-content">
+                <strong>Entrada de farmacia</strong>
+                <div class="stat-label">Registrar medicamentos por lote</div>
+            </div>
+            <span class="stat-card-arrow">›</span>
+        </a>
         {% endif %}
 
     </div>

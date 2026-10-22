@@ -1,96 +1,28 @@
-
-{% extends "base.html" %}
-
-{% block content %}
-
-<h1>{{ medicamento.articulo.nombre }}</h1>
-
-<div class="card">
-
-    <h3>Información del medicamento</h3>
-
-    <p><strong>Código:</strong>
-        {{ medicamento.articulo.codigo|default:"-" }}
-    </p>
-
-    <p><strong>Principio activo:</strong>
-        {{ medicamento.principio_activo }}
-    </p>
-
-    <p><strong>Concentración:</strong>
-        {{ medicamento.concentracion }}
-    </p>
-
-    <p><strong>Forma farmacéutica:</strong>
-        {{ medicamento.forma_farmaceutica }}
-    </p>
-
-    <p><strong>Presentación:</strong>
-        {{ medicamento.presentacion }}
-    </p>
-
-    <p><strong>Stock total:</strong>
-        {{ stock_total }}
-    </p>
-
-    <a class="btn"
-       href="{% url 'farmacia:editar_medicamento' medicamento.pk %}">
-        Editar medicamento
-    </a>
-
-    <form method="post"
-          action="{% url 'farmacia:cambiar_estado_medicamento' medicamento.pk %}"
-          style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn">
-            {% if medicamento.activo %}
-                Desactivar
-            {% else %}
-                Activar
-            {% endif %}
-        </button>
-    </form>
-
+{% extends "farmacia/_base.html" %}
+{% block inventory_heading %}{{ medicamento.articulo.nombre }}{% endblock %}
+{% block inventory_description %}Ficha del medicamento y existencias por lote y ubicación.{% endblock %}
+{% block inventory_breadcrumb %}<a href="{% url 'farmacia:dashboard' %}">Farmacia</a><span aria-hidden="true">/</span><a href="{% url 'farmacia:lista_medicamentos' %}{% if navegacion_query %}?{{ navegacion_query }}{% endif %}">Medicamentos</a><span aria-hidden="true">/</span><span>{{ medicamento.articulo.nombre }}</span>{% endblock %}
+{% block inventory_actions %}
+<div class="inventory-actions">
+    {% if medicamento.activo and medicamento.articulo.activo %}<a class="inventory-button inventory-primary" href="{% url 'farmacia:registrar_entrada' %}?medicamento={{ medicamento.pk }}"><span aria-hidden="true">＋</span> Registrar entrada</a>{% endif %}
+    <a class="inventory-button" href="{% url 'farmacia:editar_medicamento' medicamento.pk %}">Editar medicamento</a>
+    <form method="post" action="{% url 'farmacia:cambiar_estado_medicamento' medicamento.pk %}">{% csrf_token %}<button class="inventory-button" type="submit">{% if medicamento.activo %}Desactivar{% else %}Activar{% endif %} medicamento</button></form>
 </div>
-
-<div class="card">
-
-    <h3>Stock por ubicación y lote</h3>
-
-    <div style="overflow-x:auto;">
-        <table style="width:100%;">
-            <thead>
-                <tr>
-                    <th>Ubicación</th>
-                    <th>Lote</th>
-                    <th>Vencimiento</th>
-                    <th>Cantidad</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for stock in stocks %}
-                <tr>
-                    <td>{{ stock.anexo.nombre }}</td>
-                    <td>{{ stock.lote.numero_lote }}</td>
-                    <td>{{ stock.lote.fecha_vencimiento|date:"d/m/Y" }}</td>
-                    <td>{{ stock.cantidad }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4">
-                        No existen ingresos registrados.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-</div>
-
-<a href="{% url 'farmacia:lista_medicamentos' %}"
-   class="btn">
-    Volver al catálogo
-</a>
-
+{% endblock %}
+{% block inventory_summary %}
+<dl class="farmacia-medicine-info">
+    <div><dt>Código</dt><dd>{{ medicamento.articulo.codigo|default:"Sin código" }}</dd></div>
+    <div><dt>Principio activo</dt><dd>{{ medicamento.principio_activo }}</dd></div>
+    <div><dt>Concentración</dt><dd>{{ medicamento.concentracion }}</dd></div>
+    <div><dt>Forma farmacéutica</dt><dd>{{ medicamento.forma_farmaceutica }}</dd></div>
+    <div><dt>Presentación</dt><dd>{{ medicamento.presentacion|default:"Sin especificar" }}</dd></div>
+    <div><dt>Unidad de existencias</dt><dd>{{ medicamento.unidad_medida|default:"Sin definir: complete la ficha antes de recibir unidades" }}</dd></div>
+    <div><dt>Receta</dt><dd>{% if medicamento.requiere_receta %}Requiere receta{% else %}No requiere receta{% endif %}</dd></div>
+</dl>
+{% endblock %}
+{% block inventory_body %}
+<div class="farmacia-section-heading"><h2>Existencias por lote</h2><span class="inventory-muted">{{ stock_total }} unidades según filtros</span></div>
+{% include "farmacia/_filtros.html" %}
+{% include "farmacia/_stocks.html" %}
+<p class="inventory-footnote">El stock filtrado puede incluir lotes vencidos o inactivos. Revise el estado de cada lote.</p>
 {% endblock %}

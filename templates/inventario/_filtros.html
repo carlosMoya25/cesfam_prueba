@@ -1,0 +1,9 @@
+<form method="get" class="inventory-catalog-search" role="search">
+    <div class="inventory-catalog-fields">
+        {% for field in filtros_form %}
+        <div><label {% if field.name == 'buscar' %}class="inventory-sr-only"{% endif %} for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<p class="inv-error" role="alert">{{ error }}</p>{% endfor %}</div>
+        {% endfor %}
+        <button class="inventory-button" type="submit">Buscar</button>
+        {% if filtros_query %}<a class="inventory-text-link" href="{{ request.path }}">Limpiar filtros</a>{% endif %}
+    </div>
+</form>

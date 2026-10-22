@@ -1,0 +1,49 @@
+/* Farmacia comparte los componentes visuales del inventario general. */
+.farmacia-view .sidebar-link.active { background: #008597; }
+.farmacia-view .inventory-page .inventory-primary { background: #008597; border-color: #008597; }
+.farmacia-view .inventory-page .inventory-primary:hover { background: #006c7c; border-color: #006c7c; }
+.farmacia-view .inventory-tabs a[aria-current="page"] { color: #008597; border-color: #008597; }
+.farmacia-view .inventory-preview { border-left-color: #008597; }
+.farmacia-view .inventory-page-current { background: #008597; }
+.farmacia-section-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin: 0 0 18px; }
+.farmacia-section-heading h2 { font-size: 17px; font-weight: 600; margin: 0; }
+.farmacia-medicine-info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 24px; margin: 0 0 26px; padding: 8px 0 22px; }
+.farmacia-medicine-info dt { color: #718096; font-size: 12px; margin-bottom: 6px; }
+.farmacia-medicine-info dd { color: #243a53; font-size: 14px; margin: 0; overflow-wrap: anywhere; }
+.farmacia-view .farmacia-stock-table td:first-child { min-width: 180px; }
+.farmacia-view .farmacia-stock-table th:nth-child(4), .farmacia-view .farmacia-stock-table td:nth-child(4) { white-space: nowrap; }
+.farmacia-view .inventory-actions > form { margin: 0; }
+@media (max-width: 650px) {
+    .farmacia-medicine-info { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .farmacia-view .inventory-stats span { font-size: 10px; }
+}
+
+.farmacia-import-steps { display: flex; flex-wrap: wrap; gap: 12px 28px; padding: 0 0 18px; margin: 0 0 24px; list-style: none; border-bottom: 1px solid #e2e8f0; color: #718096; font-size: 14px; }
+.farmacia-import-steps [aria-current="step"] { color: #008597; font-weight: 600; }
+.farmacia-import-intro { max-width: 920px; }
+.farmacia-import-intro h2, .farmacia-recent-imports h2 { font-size: 17px; }
+.farmacia-import-intro p { font-size: 14px; line-height: 1.7; }
+.farmacia-column-guide { margin-top: 18px; }
+.farmacia-column-guide summary { color: #008597; cursor: pointer; font-size: 14px; }
+.farmacia-column-guide .farmacia-medicine-info { margin-top: 20px; }
+.farmacia-recent-imports { margin-top: 38px; }
+.farmacia-import-preview { margin-top: 22px; }
+.farmacia-import-errors { color: #9f1239; font-size: 13px; padding-left: 16px; margin: 0; min-width: 220px; }
+.farmacia-import-preview td { max-width: 360px; overflow-wrap: anywhere; }
+
+.farmacia-registration-section { border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0 0; padding: 20px 0 0; min-width: 0; }
+.farmacia-registration-section legend { color: #243a53; font-size: 17px; font-weight: 600; padding: 0 12px 0 0; }
+
+.farmacia-autocomplete-input { position: relative; }
+.farmacia-suggestions { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 20; max-height: 340px; overflow-y: auto; margin: 0; padding: 6px; list-style: none; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; box-shadow: 0 8px 22px #243a5324; }
+.farmacia-suggestions[hidden] { display: none; }
+.farmacia-suggestions [role="option"] { padding: 10px 12px; border-radius: 5px; cursor: pointer; }
+.farmacia-suggestions [role="option"][aria-selected="true"], .farmacia-suggestions [role="option"]:hover { background: #e6f5f6; }
+.farmacia-suggestions strong, .farmacia-suggestions span, .farmacia-suggestions small { display: block; }
+.farmacia-suggestions strong { color: #243a53; font-size: 14px; }
+.farmacia-suggestions span { color: #008597; font-size: 14px; margin-top: 4px; }
+.farmacia-suggestions small { color: #64748b; margin-top: 4px; }
+.farmacia-transfer-balances { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; margin: 18px 0; }
+.farmacia-transfer-balances dt { color: #64748b; font-size: 13px; margin-bottom: 5px; }
+.farmacia-transfer-balances dd { color: #243a53; font-size: 18px; font-weight: 600; margin: 0; }
+@media (max-width: 480px) { .farmacia-transfer-balances { grid-template-columns: 1fr; gap: 14px; } }

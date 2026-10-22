@@ -156,6 +156,9 @@
         </div>
 
 
+        <p>{% if usuario_detalle.has_usable_password %}Acceso con contraseña habilitado.{% else %}Acceso mediante Google; sin contraseña local.{% endif %}{% if usuario_detalle.debe_cambiar_clave %} Debe cambiar su contraseña temporal al ingresar.{% endif %}</p>
+        {% if usuario_detalle.pk != request.user.pk %}<a class="btn btn-secondary" href="{% url 'usuarios:restablecer_clave' usuario_detalle.pk %}">Restablecer contraseña temporal</a>{% endif %}
+
         <h3>
             Roles asignados
         </h3>

@@ -1,0 +1,13 @@
+{% extends "inventario/_form_base.html" %}
+{% block title %}Cambiar contraseña | SIGRI{% endblock %}
+{% block inventory_breadcrumb %}<span>Mi cuenta</span><span aria-hidden="true">/</span><span>Cambiar contraseña</span>{% endblock %}
+{% block inventory_description %}Actualice su contraseña de acceso al sistema.{% endblock %}
+{% block inventory_body %}
+{% if cambio_obligatorio %}<div class="inventory-preview" role="alert"><strong>Debe cambiar su contraseña temporal para continuar.</strong><p>Ingrese la contraseña temporal que le entregó el administrador y elija una nueva que cumpla los requisitos indicados.</p></div>{% endif %}
+{% if form %}
+<form method="post" class="inventory-form">{% csrf_token %}
+    {% include "inventario/_form_fields.html" %}
+    <div class="inventory-form-actions"><button class="inventory-button inventory-primary" type="submit">Guardar nueva contraseña</button>{% if not cambio_obligatorio %}<a class="inventory-button" href="{% url 'dashboard' %}">Cancelar</a>{% endif %}</div>
+</form>
+{% else %}<p>Su cuenta utiliza Google y aún no tiene una contraseña local. Solicite al administrador que habilite una contraseña temporal para poder cambiarla desde aquí.</p>{% endif %}
+{% endblock %}

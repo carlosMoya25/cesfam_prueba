@@ -1,133 +1,19 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-<div class="card">
-
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:15px;">
-        <div>
-            <h2>Artículos</h2>
-
-            <p>
-                Catálogo de artículos disponibles para el control de inventario.
-            </p>
-        </div>
-
-        <a href="{% url 'inventario:crear_articulo' %}" class="btn">
-            Nuevo artículo
-        </a>
-    </div>
-
+{% extends "inventario/_base.html" %}
+{% block inventory_breadcrumb %}<a href="{% url 'inventario:panel' %}">Inventario</a><span aria-hidden="true">/</span><span>Artículos</span>{% endblock %}
+{% block inventory_heading %}Artículos{% endblock %}
+{% block inventory_description %}Catálogo del inventario general. Los medicamentos se administran desde Farmacia.{% endblock %}
+{% block inventory_actions %}<div class="inventory-actions"><a class="inventory-button inventory-primary" href="{% url 'inventario:crear_articulo' %}"><span aria-hidden="true">＋</span> Nuevo artículo</a></div>{% endblock %}
+{% block inventory_body %}
+{% include "inventario/_filtros.html" %}
+<div class="inventory-table-shell">
+    <div class="inventory-table-scroll"><table class="inventory-table">
+        <caption class="inventory-sr-only">Catálogo de artículos</caption>
+        <thead><tr><th scope="col">Artículo / código</th><th scope="col">Categoría</th><th scope="col" class="inventory-number">Stock mínimo</th><th scope="col">Estado</th><th scope="col"><span class="inventory-sr-only">Acciones</span></th></tr></thead>
+        <tbody>{% for articulo in articulos %}
+        <tr><td><strong>{{ articulo.nombre }}</strong><small>{{ articulo.codigo|default:"Sin código" }}</small>{% if articulo.descripcion %}<small class="inventory-description">{{ articulo.descripcion }}</small>{% endif %}</td><td>{{ articulo.categoria.nombre }}</td><td class="inventory-number">{{ articulo.stock_minimo }}</td><td>{% if articulo.activo %}<span class="inventory-badge inventory-badge-success">Activo</span>{% else %}<span class="inventory-badge inventory-badge-neutral">Inactivo</span>{% endif %}</td>
+            <td class="inventory-row-action"><details class="inventory-dropdown inventory-row-dropdown"><summary aria-label="Acciones para {{ articulo.nombre }}">Acciones <span aria-hidden="true">⌄</span></summary><div class="inventory-dropdown-menu"><a href="{% url 'inventario:editar_articulo' articulo.pk %}">Editar artículo</a>{% if articulo.activo %}<a href="{% url 'inventario:entrada' %}?articulo={{ articulo.pk }}">Registrar entrada</a>{% endif %}</div></details></td></tr>
+        {% empty %}<tr><td colspan="5" class="inventory-empty"><strong>No se encontraron artículos</strong><p>Pruebe otra búsqueda o registre un artículo nuevo.</p></td></tr>{% endfor %}</tbody>
+    </table></div>
+    {% include "inventario/_paginacion.html" %}
 </div>
-
-
-<div class="card">
-
-    {% if articulos %}
-
-    <table style="width:100%; border-collapse:collapse;">
-
-        <thead>
-            <tr>
-                <th style="text-align:left; padding:10px;">
-                    Código
-                </th>
-
-                <th style="text-align:left; padding:10px;">
-                    Artículo
-                </th>
-
-                <th style="text-align:left; padding:10px;">
-                    Categoría
-                </th>
-
-                <th style="text-align:center; padding:10px;">
-                    Stock mínimo
-                </th>
-
-                <th style="text-align:center; padding:10px;">
-                    Estado
-                </th>
-
-                <th style="text-align:center; padding:10px;">
-                    Acciones
-                </th>
-            </tr>
-        </thead>
-
-
-        <tbody>
-
-            {% for articulo in articulos %}
-
-            <tr>
-
-                <td style="padding:10px;">
-                    {{ articulo.codigo|default:"-" }}
-                </td>
-
-                <td style="padding:10px;">
-                    <strong>
-                        {{ articulo.nombre }}
-                    </strong>
-
-                    {% if articulo.descripcion %}
-                    <br>
-                    <small>
-                        {{ articulo.descripcion }}
-                    </small>
-                    {% endif %}
-                </td>
-
-                <td style="padding:10px;">
-                    {{ articulo.categoria.nombre }}
-                </td>
-
-                <td style="padding:10px; text-align:center;">
-                    {{ articulo.stock_minimo }}
-                </td>
-
-                <td style="padding:10px; text-align:center;">
-                    {% if articulo.activo %}
-                    Activo
-                    {% else %}
-                    Inactivo
-                    {% endif %}
-                </td>
-
-                <td style="padding:10px; text-align:center;">
-
-                    <a href="{% url 'inventario:editar_articulo' articulo.id %}" class="btn">
-                        Editar
-                    </a>
-
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
-
-    {% else %}
-
-    <p>
-        No existen artículos registrados.
-    </p>
-
-    {% endif %}
-
-</div>
-
-
-<div class="card">
-
-    <a href="{% url 'inventario:panel' %}" class="btn">
-        Volver al inventario
-    </a>
-
-</div>
-
 {% endblock %}

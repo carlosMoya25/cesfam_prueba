@@ -213,6 +213,14 @@
         </div>
 
 
+        {% if form.modo_acceso %}
+        <div class="admin-form-section"><h2>Contraseña y forma de acceso</h2>
+            <div class="form-group">{{ form.modo_acceso.label_tag }}{{ form.modo_acceso }}{{ form.modo_acceso.errors }}</div>
+            <p>Si elige acceso con contraseña, complete ambos campos. El usuario deberá cambiarla al ingresar.</p>
+            {% include "usuarios/_clave_temporal.html" %}
+        </div>
+        {% endif %}
+
         <!-- ACCESO -->
 
         <div class="admin-form-section">

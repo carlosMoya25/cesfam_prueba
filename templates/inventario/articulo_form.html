@@ -1,35 +1,10 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-<div class="card">
-
-    <h2>{{ titulo }}</h2>
-
-    <p>
-        Complete la información del artículo.
-    </p>
-
-    <form method="post">
-
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <div style="margin-top:20px;">
-
-            <button type="submit" class="btn">
-                Guardar
-            </button>
-
-            <a href="{% url 'inventario:articulos' %}" class="btn">
-                Cancelar
-            </a>
-
-        </div>
-
-    </form>
-
-</div>
-
+{% extends "inventario/_form_base.html" %}
+{% block inventory_description %}Complete los datos del artículo y el mínimo de existencias por ubicación.{% endblock %}
+{% block inventory_body %}
+<a class="inventory-back-link" href="{% url 'inventario:articulos' %}">‹ Volver a artículos</a>
+<form method="post" class="inventory-form">
+    {% csrf_token %}
+    {% include "inventario/_form_fields.html" %}
+    <div class="inventory-form-actions"><button type="submit" class="inventory-button inventory-primary">Guardar artículo</button><a href="{% url 'inventario:articulos' %}" class="inventory-button">Cancelar</a></div>
+</form>
 {% endblock %}

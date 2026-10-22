@@ -1,89 +1,15 @@
-
-{% extends "base.html" %}
-
-{% block content %}
-
-<h1>Administrar medicamentos</h1>
-
-<div class="card">
-
-    <a href="{% url 'farmacia:crear_medicamento' %}"
-       class="btn">
-        + Registrar medicamento
-    </a>
-
-    <a href="{% url 'farmacia:dashboard' %}"
-       class="btn">
-        Volver a Farmacia
-    </a>
-
-</div>
-
-<div class="card">
-
-    <h3>Catálogo de medicamentos</h3>
-
-    <form method="get">
-        <input
-            type="search"
-            name="q"
-            value="{{ busqueda }}"
-            placeholder="Buscar medicamento o código"
-        >
-        <button class="btn" type="submit">Buscar</button>
-    </form>
-
-    <div style="overflow-x:auto;">
-
-        <table style="width:100%;">
-            <thead>
-                <tr>
-                    <th>Medicamento</th>
-                    <th>Código</th>
-                    <th>Concentración</th>
-                    <th>Stock total</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for medicamento in medicamentos %}
-                <tr>
-                    <td>{{ medicamento.articulo.nombre }}</td>
-                    <td>{{ medicamento.articulo.codigo|default:"-" }}</td>
-                    <td>{{ medicamento.concentracion }}</td>
-                    <td>{{ medicamento.stock_total|default_if_none:0 }}</td>
-                    <td>
-                        {% if medicamento.activo %}
-                            Activo
-                        {% else %}
-                            Inactivo
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a class="btn"
-                           href="{% url 'farmacia:detalle_medicamento' medicamento.pk %}">
-                            Ver
-                        </a>
-
-                        <a class="btn"
-                           href="{% url 'farmacia:editar_medicamento' medicamento.pk %}">
-                            Editar
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6">
-                        No hay medicamentos registrados.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-    </div>
-</div>
-
+{% extends "farmacia/_base.html" %}
+{% block inventory_body %}
+{% include "farmacia/_filtros.html" %}
+<div class="farmacia-section-heading"><h2>Catálogo de medicamentos</h2><a class="inventory-text-link" href="{% url 'farmacia:crear_medicamento' %}">＋ Registrar medicamento</a></div>
+<div class="inventory-table-shell"><div class="inventory-table-scroll"><table class="inventory-table">
+    <caption class="inventory-sr-only">Catálogo de medicamentos</caption>
+    <thead><tr><th scope="col">Medicamento / código</th><th scope="col">Principio activo</th><th scope="col">Presentación</th><th scope="col" class="inventory-number">Stock filtrado</th><th scope="col">Estado</th><th scope="col"><span class="inventory-sr-only">Acciones</span></th></tr></thead>
+    <tbody>{% for medicamento in medicamentos %}<tr>
+        <td><strong>{{ medicamento.articulo.nombre }}</strong><small>{{ medicamento.articulo.codigo|default:"Sin código" }} · {{ medicamento.concentracion }}</small></td><td>{{ medicamento.principio_activo }}</td><td>{{ medicamento.forma_farmaceutica }}{% if medicamento.presentacion %}<small>{{ medicamento.presentacion }}</small>{% endif %}</td><td class="inventory-number">{{ medicamento.stock_total }}</td>
+        <td>{% if medicamento.activo and medicamento.articulo.activo %}<span class="inventory-badge inventory-badge-success">Activo</span>{% else %}<span class="inventory-badge inventory-badge-neutral">Inactivo</span>{% endif %}</td>
+        <td class="inventory-row-action"><details class="inventory-dropdown inventory-row-dropdown"><summary aria-label="Acciones para {{ medicamento.articulo.nombre }}">Acciones <span aria-hidden="true">⌄</span></summary><div class="inventory-dropdown-menu"><a href="{% url 'farmacia:detalle_medicamento' medicamento.pk %}{% if navegacion_query %}?{{ navegacion_query }}{% endif %}">Ver medicamento</a><a href="{% url 'farmacia:editar_medicamento' medicamento.pk %}">Editar medicamento</a>{% if medicamento.activo and medicamento.articulo.activo %}<a href="{% url 'farmacia:registrar_entrada' %}?medicamento={{ medicamento.pk }}">Registrar entrada</a>{% endif %}</div></details></td>
+    </tr>{% empty %}<tr><td colspan="6" class="inventory-empty"><strong>No se encontraron medicamentos</strong><p>Pruebe otros filtros o registre un medicamento.</p></td></tr>{% endfor %}</tbody>
+</table></div>{% include "farmacia/_paginacion.html" %}</div>
+<p class="inventory-footnote">El stock filtrado puede incluir lotes vencidos o inactivos. Revise el estado de cada lote antes de utilizarlo.</p>
 {% endblock %}

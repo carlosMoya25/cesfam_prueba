@@ -66,6 +66,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'usuarios.middleware.CambioClaveObligatorioMiddleware',
+    'core.errores.PaginasAccesoMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     "axes.middleware.AxesMiddleware",
@@ -86,6 +88,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'usuarios.context_processors.permisos_modulos',
             ],
         },
     },
@@ -204,11 +207,8 @@ AXES_LOCKOUT_TEMPLATE = "registration/locked_out.html"
 # SEGURIDAD DE SESIONES
 # ==========================================================
 
-# 30 minutos
-#SESSION_COOKIE_AGE = max_age=(30 * 60) + 300,
-
-#pruebas de 1 minuto
-SESSION_COOKIE_AGE = max_age=60
+# Expirar tras 15 minutos sin solicitudes del usuario.
+SESSION_COOKIE_AGE = 15 * 60
 
 # Renovar la expiración con cada solicitud del usuario.
 # Mientras siga utilizando el sistema, la sesión continúa activa.
