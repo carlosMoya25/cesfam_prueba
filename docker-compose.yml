@@ -1,0 +1,56 @@
+
+services:
+  cesfam-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: cesfam-web
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    command: >
+      gunicorn config.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 3
+      --timeout 120
+
+    volumes:
+      - cesfam_static:/app/staticfiles
+      - cesfam_media:/app/media
+
+    expose:
+      - "8000"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    networks:
+      - proxy
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      # Dominios
+      - "traefik.http.routers.cesfam.rule=Host(`cesfam.liceosp.cl`) || Host(`www.cesfam.liceosp.cl`)"
+
+      # HTTPS
+      - "traefik.http.routers.cesfam.entrypoints=websecure"
+      - "traefik.http.routers.cesfam.tls=true"
+      - "traefik.http.routers.cesfam.tls.certresolver=letsencrypt"
+
+      # Puerto interno de Django
+      - "traefik.http.services.cesfam.loadbalancer.server.port=8000"
+      - "traefik.http.routers.cesfam.service=cesfam"
+
+volumes:
+  cesfam_static:
+  cesfam_media:
+
+networks:
+  proxy:
+    external: true
